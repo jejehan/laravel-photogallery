@@ -6,18 +6,27 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use DB;
+use Auth;
 
 class GalleryController extends Controller
 {
+    private $tableName = 'galleries';
+
     //List of Photo Gallery
     public function index(){
+        $galeries = DB::table($this->tableName)->get();
+
         //render view
-        return view('gallery/index');
+        return view('gallery/index',compact('galeries'));
     }
 
     //show to create gallery form
     public function create()
     {
+        if (!Auth::check()) {
+            return \Redirect::route('gallery.index');
+        }
+
         //render view
         return view('gallery/create');
     }
@@ -36,7 +45,7 @@ class GalleryController extends Controller
             $cover_image_filename = 'noimage.jpg';
         }
 
-        DB::table('galeries')->insert([
+        DB::table($this->tableName)->insert([
             'name'          => $name,
             'description'   => $description,
             'cover_image'   => $cover_image_filename,
@@ -50,7 +59,13 @@ class GalleryController extends Controller
     //show gallery
     public function show( $id )
     {
-        die('gallery/show/' . $id );
+        $gallery = DB::table($this->tableName)->where('id',$id)->first();
+        if (!$gallery) {
+            return \Redirect::route('gallery.index');
+        }
+
+        $photos = DB::table('photos')->where('gallery_id',$gallery->id)->get();
+        return view('gallery/show',compact('gallery','photos'));
     }
 
 }

@@ -6,28 +6,54 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 
+use DB;
+use Auth;
+
 class PhotoController extends Controller
 {
-    //List of Photo
-    public function index(){
-        die('photo/index');
-    }
 
     //show to create photo form
-    public function create()
+    public function create( $id )
     {
-        die('photo/create');
+        if (!Auth::check()) {
+            return \Redirect::route('gallery.index');
+        }
+
+        $gallery_id = $id;
+        return view('photo/create',compact('gallery_id'));
     }
 
-    //store data gallery
-    public function store(Request $store)
+    public function store(Request $request)
     {
-        die('photo/store');
+
+        $title          = $request->input('title');
+        $location       = $request->input('location');
+        $description    = $request->input('description');
+        $image          = $request->file('image');
+
+        if ($image) {
+            $image_file_name = $image->getClientOriginalName();
+            $image->move(public_path('images'), $image_file_name);
+        }else{
+            $image_file_name = 'noimage.jpg';
+        }
+
+        $gallery_id     = $request->input('gallery_id');
+        $owner_id       = 1;
+
+        DB::table('photos')->insert([
+            'title'         => $title,
+            'location'      => $location,
+            'description'   => $description,
+            'image'         => $image_file_name,
+            'gallery_id'    => $gallery_id,
+            'owner_id'      => $owner_id,
+            'created_at'    => \Carbon\Carbon::now()->toDateTimeString(),
+            'updated_at'    => \Carbon\Carbon::now()->toDateTimeString(),
+        ]);
+
+        return \Redirect::route('gallery.show',array('id'=>$gallery_id));
+
     }
 
-    //show gallery
-    public function details( $id )
-    {
-        die('photo/details/' . $id );
-    }
 }

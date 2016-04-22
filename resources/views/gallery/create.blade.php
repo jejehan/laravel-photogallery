@@ -13,7 +13,6 @@
             {!! Form::label('cover_image', 'Cover Image') !!}
             {!! Form::file('cover_image') !!}
             {!! Form::submit('Submit', $attributes = ['class' => 'button']) !!}
-
         {!! Form::close() !!}
 
     </div>

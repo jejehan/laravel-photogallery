@@ -18,6 +18,7 @@ class CreatePhotos extends Migration
             $table->string('description');
             $table->string('location');
             $table->string('image');
+            $table->string('gallery_id');
             $table->string('owner_id');
             $table->timestamps();
         });
